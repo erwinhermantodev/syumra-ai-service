@@ -11,7 +11,7 @@ log = logging.getLogger(__name__)
 app = FastAPI(title="Syumra Contract Review", version="1.0.0")
 
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434") + "/api/generate"
-MODEL = "llama3:8b"
+MODEL = "llama3"
 
 REVIEW_PROMPT = """Kamu adalah AI penganalisis kontrak umroh/haji.
 Analisis kontrak berikut dan identifikasi klausul berisiko.

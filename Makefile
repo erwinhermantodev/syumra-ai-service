@@ -1,4 +1,4 @@
-.PHONY: install scrape-kemenag etl build-kb run-scam run-trust run-contract run-guidance test
+.PHONY: install scrape-kemenag scrape-signals scrape-all etl build-kb run-scam run-trust run-contract run-guidance test
 
 install:
 	pip install -r requirements.txt
@@ -6,6 +6,14 @@ install:
 
 scrape-kemenag:
 	python pipeline/scrapers/kemenag_scraper.py
+
+scrape-signals:
+	python pipeline/scrapers/web_signal_scraper.py
+
+scrape-all:
+	python pipeline/scrapers/kemenag_scraper.py
+	python pipeline/scrapers/web_signal_scraper.py
+	python pipeline/etl/normalizer.py
 
 etl:
 	python pipeline/etl/normalizer.py

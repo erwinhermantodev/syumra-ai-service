@@ -1,4 +1,6 @@
+# pyrefly: ignore [missing-import]
 from fastapi import FastAPI
+# pyrefly: ignore [missing-import]
 from pydantic import BaseModel
 import requests
 import os
@@ -14,14 +16,27 @@ SYSTEM_PROMPT: dict[str, str] = {
     "id": (
         "Kamu adalah asisten panduan ibadah Haji/Umrah yang berpengetahuan luas. "
         "Jawab berdasarkan sumber Islam yang sahih (Quran, Hadis, fiqh muktamad). "
-        "Gunakan bahasa yang mudah dipahami jamaah awam. "
-        "Tambahkan disclaimer: 'Konsultasikan dengan ustadz untuk kepastian hukum.'"
+        "Gunakan bahasa Indonesia yang mudah dipahami jamaah awam. "
+        "WAJIB menjawab dalam Bahasa Indonesia, tidak peduli apapun pertanyaannya. "
+        "Tambahkan disclaimer di akhir: 'Konsultasikan dengan ustadz untuk kepastian hukum.'"
     ),
-    "ar": "أنت مرشد متخصص في مناسك الحج والعمرة. أجب بناءً على المصادر الإسلامية الصحيحة.",
+    "ar": (
+        "أنت مرشد متخصص في مناسك الحج والعمرة. "
+        "أجب بناءً على المصادر الإسلامية الصحيحة (القرآن الكريم والسنة النبوية والفقه المعتمد). "
+        "يجب الإجابة باللغة العربية فقط."
+    ),
     "en": (
         "You are a knowledgeable Hajj/Umrah guide assistant. "
-        "Answer based on authentic Islamic sources. Be clear and practical."
+        "Answer based on authentic Islamic sources (Quran, Hadith, accepted fiqh). "
+        "You MUST reply in English only, regardless of the question language. "
+        "Be clear and practical."
     ),
+}
+
+LANG_INSTRUCTION: dict[str, str] = {
+    "id": "PENTING: Jawab HANYA dalam Bahasa Indonesia.",
+    "ar": "مهم: أجب باللغة العربية فقط.",
+    "en": "IMPORTANT: Reply ONLY in English.",
 }
 
 
@@ -41,6 +56,7 @@ class GuidanceResponse(BaseModel):
 def _retrieve_context(query: str, phase: str) -> list[str]:
     """Retrieve relevant chunks from ChromaDB. Returns [] if unavailable."""
     try:
+        # pyrefly: ignore [missing-import]
         import chromadb
         client = chromadb.HttpClient(host=CHROMA_HOST, port=8000)
         collection = client.get_collection("manasik_knowledge")
@@ -64,6 +80,8 @@ def guidance_chat(q: GuidanceQuery) -> GuidanceResponse:
 
     prompt = f"""{SYSTEM_PROMPT[lang]}
 
+{LANG_INSTRUCTION[lang]}
+
 Konteks referensi:
 {context}
 
@@ -74,7 +92,7 @@ Jawaban:"""
         r = requests.post(
             OLLAMA_URL,
             json={
-                "model": "llama3:8b",
+                "model": "llama3",
                 "prompt": prompt,
                 "stream": False,
                 "options": {"temperature": 0.2, "num_predict": 512},

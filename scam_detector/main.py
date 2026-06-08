@@ -9,7 +9,7 @@ log = logging.getLogger(__name__)
 app = FastAPI(title="Syumra Scam Detector", version="1.0.0")
 
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434") + "/api/generate"
-MODEL = "mistral:7b"
+MODEL = "llama3"
 
 SCAM_PROMPT = """Kamu adalah sistem deteksi penipuan travel umroh/haji.
 Analisis teks agen berikut dan kembalikan JSON:
